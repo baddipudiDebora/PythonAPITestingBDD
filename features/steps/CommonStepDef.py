@@ -4,10 +4,9 @@ import api_utils  # Import the utility module
 @given('I call the "{api_verb}" verb request for the endpoint "{endpoint_name}" with path parameters "{pet_id}"')
 def step_impl(context, api_verb, endpoint_name, pet_id):
     """Stores the request details and sends API request"""
-    url = api_utils.get_url(endpoint_name, pet_id)
-    headers = api_utils.get_headers()
-    print(url)
-    context.response = api_utils.send_request(api_verb, url, headers)
+    context.api_verb = api_verb
+    context.url = api_utils.get_url(endpoint_name, pet_id)
+    print(context.url)
 
 @when("I attach headers")
 def step_attach_headers(context):
@@ -16,7 +15,7 @@ def step_attach_headers(context):
 
 @when("I send the request")
 def step_send_request(context):
-    """Ensures request is sent within another step if needed"""
+    context.response = api_utils.send_request(context.api_verb, context.url, context.headers)
     if not hasattr(context, "response"):
         raise RuntimeError("Response not found. Ensure the request step runs before this step.")
 
