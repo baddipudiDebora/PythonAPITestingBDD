@@ -1,4 +1,4 @@
-# Created by Anuhya at 6/14/2025
+# Created by Debora at 6/14/2025
 Feature: GET Pet By ID endpoint
   # Enter feature description here
 

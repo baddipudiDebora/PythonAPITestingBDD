@@ -1,20 +1,23 @@
+import config
 from behave import *
 import configparser
 import json
 import requests
+import json
+from behave import use_step_matcher
+import os
+from Config import config
 
-use_step_matcher("re")
-
+import requests
 
 @given("I call the 'GET' verb request for the endpoint 'PETByID'")
 def step_impl(context):
- url = "https://petstore.swagger.io/v2/pet/1"
- headers = {"Content-Type": "application/json"}
- response = requests.get(url, headers=headers)
+    url = config.get_url("PETByID", pet_id=1)  # Dynamic pet ID
+    headers = config.get_headers()
 
- # Print response status and data
- print("Status Code:", response.status_code)
- print("Response JSON:", response.json())
+    response = requests.get(url, headers=headers)
+    print("Response:", response.json())
+
 
 
 @when("I attach headers")
