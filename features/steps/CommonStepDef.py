@@ -1,11 +1,19 @@
 from behave import given, when, then
-import api_utils  # Import the utility module
+import api_utils  # Utility module for requests and config
 
 @given('I call the "{api_verb}" verb request for the endpoint "{endpoint_name}" with path parameters "{pet_id}"')
 def step_impl(context, api_verb, endpoint_name, pet_id):
     """Stores the request details and sends API request"""
     context.api_verb = api_verb
     context.url = api_utils.get_url(endpoint_name, pet_id)
+    print(context.url)
+
+
+@given('I call the "{api_verb}" verb request for the endpoint "{endpoint_name}" with query parameters "{query_params}"')
+def step_impl_query(context, api_verb, endpoint_name, query_params):
+    context.api_verb = api_verb
+    base_url = api_utils.get_url(endpoint_name)  # Get the base URL without pet_id
+    context.url = f"{base_url}?{query_params}"  # Append query parameters
     print(context.url)
 
 @when("I attach headers")
