@@ -39,6 +39,7 @@ def step_validate_status(context, expected_status):
 @given('I call the "{api_verb}" verb request for the endpoint "{endpointname}"')
 def step_impl(context, api_verb, endpointname):
     context.api_verb = api_verb
+    print(context.api_verb)
     context.url = api_utils.get_url(endpointname)
     context.base_url = api_utils.get_url(endpointname)  # Get the base URL without pet_id
 
