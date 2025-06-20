@@ -12,8 +12,9 @@ def step_impl(context, api_verb, endpoint_name, pet_id):
 @given('I call the "{api_verb}" verb request for the endpoint "{endpoint_name}" with query parameters "{query_params}"')
 def step_impl_query(context, api_verb, endpoint_name, query_params):
     context.api_verb = api_verb
-    base_url = api_utils.get_url(endpoint_name)  # Get the base URL without pet_id
-    context.url = f"{base_url}?{query_params}"  # Append query parameters
+    context.base_url = api_utils.get_url(endpoint_name)  # Get the base URL without pet_id
+    context.url = f"{context.base_url}?{query_params}"  # Append query parameters
+    assert "/" in context.url , "Expected '/' means path params concatenated in the string"
     print(context.url)
 
 @when("I attach headers")
@@ -33,3 +34,24 @@ def step_validate_status(context, expected_status):
     actual_status = context.response.status_code
     assert str(actual_status) == expected_status, f"Expected {expected_status}, but got {actual_status}"
     print(f"Response Status: {actual_status}")
+
+
+@given('I call the "{api_verb}" verb request for the endpoint "{endpointname}"')
+def step_impl(context, api_verb, endpointname):
+    context.api_verb = api_verb
+    context.url = api_utils.get_url(endpointname)
+    context.base_url = api_utils.get_url(endpointname)  # Get the base URL without pet_id
+
+
+@given('I setup the query parameters "{query_params}"')
+def step_impl(context,query_params):
+    context.url = f"{context.base_url}?{query_params}"  # Append query parameters
+    assert "/" in context.url , "Expected '/' means path params concatenated in the string"
+    print(context.url)
+
+
+
+@given("I add the path params '{pet_id}'")
+def step_impl(context, pet_id):
+    context.url = context.base_url.replace("{pet_id}", str(pet_id)) # Append query parameters
+    print(context.url)
