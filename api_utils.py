@@ -37,3 +37,10 @@ def send_request(api_verb, url, headers=None, jsondata=None):
         return requests.post(url, json=jsondata, headers=headers)
     else:
         raise ValueError(f"Unsupported API verb: {api_verb}")
+
+
+def log_request_context(context):
+    print(f"\n📡 API Verb: {getattr(context, 'api_verb', 'N/A')}")
+    print(f"🌍 URL: {getattr(context, 'url', 'N/A')}")
+    print(f"🧾 Headers: {getattr(context, 'headers', {})}")
+    print(f"📦 Payload: {getattr(context, 'json_data', {})}\n")

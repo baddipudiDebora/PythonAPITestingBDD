@@ -6,56 +6,6 @@ import api_utils  # Utility module for requests and config
 import api_validations
 
 
-@given('I call the "{api_verb}" verb request for the endpoint "{endpoint_name}" with path parameters "{pet_id}"')
-def step_impl(context, api_verb, endpoint_name, pet_id):
-    """Stores the request details and sends API request"""
-    context.api_verb = api_verb
-    context.url = api_utils.get_url(endpoint_name, pet_id)
-    print(context.url)
-
-
-@given('I call the "{api_verb}" verb request for the endpoint "{endpoint_name}" with query parameters "{query_params}"')
-def step_impl_query(context, api_verb, endpoint_name, query_params):
-    context.api_verb = api_verb
-    context.base_url = api_utils.get_url(endpoint_name)  # Get the base URL without pet_id
-    context.url = f"{context.base_url}?{query_params}"  # Append query parameters
-    assert "/" in context.url , "Expected '/' means path params concatenated in the string"
-    print(context.url)
-
-@when("I attach headers")
-def step_attach_headers(context):
-    """Headers are attached automatically by utility functions, but additional modifications can be done here."""
-    context.headers = api_utils.get_headers()
-
-
-@when("I send the request")
-def step_send_request(context):
-    print(context.api_verb)
-    print(context.url)
-    print(getattr(context, "json_data", None))  # May not exist in GET requests
-    print(context.headers)
-
-    if context.api_verb.upper() == "POST":
-        context.response = api_utils.send_request(
-            api_verb=context.api_verb,
-            url=context.url,
-            headers=context.headers,
-            jsondata=context.json_data
-        )
-    else:
-        context.response = api_utils.send_request(
-            api_verb=context.api_verb,
-            url=context.url,
-            headers=context.headers
-        )
-
-    if not hasattr(context, "response"):
-        raise RuntimeError("Response not found. Ensure the request step runs before this step.")
-
-@then("I validate the status code is '{expected_status}'")
-def step_validate_status(context, expected_status):
-    api_validations.assert_status_code(context.response, expected_status)
-
 @given('I call the "{api_verb}" verb request for the endpoint "{endpointname}"')
 def step_impl(context, api_verb, endpointname):
     context.api_verb = api_verb
@@ -81,8 +31,43 @@ def step_impl(context, pet_id):
 @given("I add a payload from '{jsonfileName}' json file")
 def step_impl(context, jsonfileName):
     file_path = os.path.join(os.path.dirname(__file__), 'jsonSamples', jsonfileName + '.json')
-    with open(file_path, 'r') as file:
-        context.json_data = json.load(file)
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"🚫 File '{file_path}' not found. Please check the filename or path.")
+    try:
+        with open(file_path, 'r') as file:
+            context.json_data = json.load(file)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"⚠️ Failed to parse JSON from '{file_path}': {e}")
 
 
+@when("I attach headers")
+def step_attach_headers(context):
+    """Headers are attached automatically by utility functions, but additional modifications can be done here."""
+    context.headers = api_utils.get_headers()
+
+
+@when("I send the request")
+def step_send_request(context):
+    api_utils.log_request_context(context)
+
+    if context.api_verb.upper() == "POST":
+        context.response = api_utils.send_request(
+            api_verb=context.api_verb,
+            url=context.url,
+            headers=context.headers,
+            jsondata=context.json_data
+        )
+    else:
+        context.response = api_utils.send_request(
+            api_verb=context.api_verb,
+            url=context.url,
+            headers=context.headers
+        )
+
+    if not hasattr(context, "response"):
+        raise RuntimeError("Response not found. Ensure the request step runs before this step.")
+
+@then("I validate the status code is '{expected_status}'")
+def step_validate_status(context, expected_status):
+    api_validations.assert_status_code(context.response, expected_status)
 

@@ -1,0 +1,7 @@
+# Virtual environment folders
+venv/
+env/
+.venv/
+.Lib/
+Lib/
+Scripts/
