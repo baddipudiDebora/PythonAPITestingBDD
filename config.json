@@ -4,7 +4,9 @@
         "PETByID": "/pet/{pet_id}",
         "FindByStatus": "/pet/findByStatus",
         "AddPet": "/pet",
-        "ORDER_PET": "/store/order"
+        "ORDER_PET": "/store/order",
+        "CREATEUserList": "/user/createWithList",
+        "DELETEUser": "/user/{username}"
     },
     "headers": {
         "Content-Type": "application/json"

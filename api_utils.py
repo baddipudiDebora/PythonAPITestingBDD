@@ -47,9 +47,9 @@ def send_request(api_verb, url, headers=None, jsondata=None):
     """Send API request based on the HTTP verb."""
     api_verb = api_verb.lower()
 
-    if api_verb == "get":
+    if api_verb in ("get","delete"):
         return requests.get(url, headers=headers)
-    elif api_verb == "post":
+    elif api_verb in ("post","put"):
         return requests.post(url, json=jsondata, headers=headers)
     else:
         raise ValueError(f"Unsupported API verb: {api_verb}")
@@ -63,9 +63,9 @@ def log_request_context(context):
 
 
 def send_request_for_context(context):
-    if context.api_verb.upper() in ("POST", "PUT", "DELETE"):
+    if context.api_verb.upper() in ("POST", "PUT"):
         context.response = send_request(api_verb=context.api_verb,url=context.url,headers=context.headers,jsondata=context.json_data)
-    elif context.api_verb.upper() == "GET":
+    elif context.api_verb.upper() in ("GET", "DELETE"):
         context.response = send_request(api_verb=context.api_verb,url=context.url,headers=context.headers)
     else:
         raise RuntimeError("Not a valid API verb")
@@ -83,12 +83,21 @@ def logResponse_context(context):
         print(f"❗ Response is not JSON: {context.response.text}")
 
 
+def parse_value(value):
+    try:
+        # Try converting strings like "true", "123", or lists/objects into Python types
+        return json.loads(value)
+    except (json.JSONDecodeError, TypeError):
+        return value  # Fall back to raw string if it can't be parsed
+
+
 def load_and_override_json(jsonfileName, override_table, folder='jsonSamples'):
     payload = load_json_payload(jsonfileName, folder)
 
     for row in override_table:
         field = row['field'] if 'field' in row.headings else row[0]
-        value = row['value'] if 'value' in row.headings else row[1]
+        raw_value = row['value'] if 'value' in row.headings else row[1]
+        value = parse_value(raw_value)
 
         if '.' in field:
             keys = field.split('.')

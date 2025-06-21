@@ -23,6 +23,13 @@ def step_impl(context, pet_id):
     context.url = context.base_url.replace("{pet_id}", str(pet_id)) # Append query parameters
     print(context.url)
 
+@given("I add the path params")
+def step_impl(context):
+    for row in context.table:
+        placeholder = row['key']
+        replacement = str(row['value'])
+        context.url = context.url.replace(f"{{{placeholder}}}", replacement)
+
 
 @given("I add a payload from '{jsonfileName}' json file")
 def step_impl(context, jsonfileName):

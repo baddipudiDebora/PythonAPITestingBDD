@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "username": "Deb01",
+    "firstName": "Deb",
+    "lastName": "Baddup",
+    "email": "deb.badddipudi@gmail.com",
+    "password": "mypswd",
+    "phone": "4358996781",
+    "userStatus": 1
+  },
+    {
+    "id": 2,
+    "username": "Anu01",
+    "firstName": "Deb",
+    "lastName": "Baddup",
+    "email": "deb.badddipudi@gmail.com",
+    "password": "mypswd",
+    "phone": "4358996781",
+    "userStatus": 1
+  }
+]
