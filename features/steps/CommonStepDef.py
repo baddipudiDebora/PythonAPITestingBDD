@@ -1,3 +1,6 @@
+import json
+import os
+
 from behave import given, when, then
 import api_utils  # Utility module for requests and config
 
@@ -23,8 +26,27 @@ def step_attach_headers(context):
     context.headers = api_utils.get_headers()
 
 @when("I send the request")
+@when("I send the request")
 def step_send_request(context):
-    context.response = api_utils.send_request(context.api_verb, context.url, context.headers)
+    print(context.api_verb)
+    print(context.url)
+    print(getattr(context, "json_data", None))  # May not exist in GET requests
+    print(context.headers)
+
+    if context.api_verb.upper() == "POST":
+        context.response = api_utils.send_request(
+            api_verb=context.api_verb,
+            url=context.url,
+            headers=context.headers,
+            jsondata=context.json_data
+        )
+    else:
+        context.response = api_utils.send_request(
+            api_verb=context.api_verb,
+            url=context.url,
+            headers=context.headers
+        )
+
     if not hasattr(context, "response"):
         raise RuntimeError("Response not found. Ensure the request step runs before this step.")
 
@@ -56,3 +78,13 @@ def step_impl(context,query_params):
 def step_impl(context, pet_id):
     context.url = context.base_url.replace("{pet_id}", str(pet_id)) # Append query parameters
     print(context.url)
+
+
+@given("I add a payload from '{jsonfileName}' json file")
+def step_impl(context, jsonfileName):
+    file_path = os.path.join(os.path.dirname(__file__), 'jsonSamples', jsonfileName + '.json')
+    with open(file_path, 'r') as file:
+        context.json_data = json.load(file)
+
+
+

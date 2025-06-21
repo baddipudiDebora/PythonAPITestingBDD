@@ -1,9 +1,10 @@
 {
-    "base_url": "https://petstore.swagger.io/v2/pet",
+    "base_url": "https://petstore.swagger.io/v2",
     "endpoints": {
-        "PETByID": "/{pet_id}",
-        "FindByStatus": "/findByStatus",
-        "AddPet": "/v2/pet"
+        "PETByID": "/pet/{pet_id}",
+        "FindByStatus": "/pet/findByStatus",
+        "AddPet": "/pet",
+        "ORDER_PET": "/store/order"
     },
     "headers": {
         "Content-Type": "application/json"
