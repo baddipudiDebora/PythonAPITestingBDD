@@ -3,6 +3,8 @@ import os
 
 from behave import given, when, then
 import api_utils  # Utility module for requests and config
+import api_validations
+
 
 @given('I call the "{api_verb}" verb request for the endpoint "{endpoint_name}" with path parameters "{pet_id}"')
 def step_impl(context, api_verb, endpoint_name, pet_id):
@@ -25,7 +27,7 @@ def step_attach_headers(context):
     """Headers are attached automatically by utility functions, but additional modifications can be done here."""
     context.headers = api_utils.get_headers()
 
-@when("I send the request")
+
 @when("I send the request")
 def step_send_request(context):
     print(context.api_verb)
@@ -52,11 +54,7 @@ def step_send_request(context):
 
 @then("I validate the status code is '{expected_status}'")
 def step_validate_status(context, expected_status):
-    """Validates the response status code"""
-    actual_status = context.response.status_code
-    assert str(actual_status) == expected_status, f"Expected {expected_status}, but got {actual_status}"
-    print(f"Response Status: {actual_status}")
-
+    api_validations.assert_status_code(context.response, expected_status)
 
 @given('I call the "{api_verb}" verb request for the endpoint "{endpointname}"')
 def step_impl(context, api_verb, endpointname):
