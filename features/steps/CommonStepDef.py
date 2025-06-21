@@ -29,6 +29,12 @@ def step_impl(context, jsonfileName):
     context.json_data = load_json_payload(jsonfileName)
 
 
+
+@given("I load the payload from '{jsonfileName}' and override fields")
+def step_impl(context, jsonfileName):
+    context.json_data = api_utils.load_and_override_json(jsonfileName, context.table)
+
+
 @when("I attach headers")
 def step_attach_headers(context):
     """Headers are attached automatically by utility functions, but additional modifications can be done here."""

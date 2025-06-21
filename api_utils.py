@@ -1,6 +1,7 @@
 import json
 import requests
 from Config import config  # Assumed to be a local module with get_headers()
+from file_util import load_json_payload
 
 
 def setup_context_for_endpoint(context, api_verb,  endpointname):
@@ -71,3 +72,34 @@ def send_request_for_context(context):
     if not hasattr(context, "response"):
         raise RuntimeError("Response not found. Ensure the request step runs before this step.")
     return None
+
+def logResponse_context(context):
+    print(f"🔢 Status Code: {context.response.status_code}")
+    print(f"📋 Headers: {context.response.headers}")
+
+    try:
+        print(f"📦 JSON Response: {context.response.json()}")
+    except Exception as e:
+        print(f"❗ Response is not JSON: {context.response.text}")
+
+
+def load_and_override_json(jsonfileName, override_table, folder='jsonSamples'):
+    payload = load_json_payload(jsonfileName, folder)
+
+    for row in override_table:
+        field = row['field'] if 'field' in row.headings else row[0]
+        value = row['value'] if 'value' in row.headings else row[1]
+
+        if '.' in field:
+            keys = field.split('.')
+            ref = payload
+            for i, key in enumerate(keys):
+                key = int(key) if key.isdigit() else key
+                if i == len(keys) - 1:
+                    ref[key] = value
+                else:
+                    ref = ref[key]
+        else:
+            payload[field] = value
+
+    return payload
