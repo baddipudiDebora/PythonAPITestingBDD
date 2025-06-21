@@ -19,11 +19,19 @@ def get_url(endpoint_name, pet_id=None):
     return f"{base_url}{endpoint_path}"
 
 
-def get_headers():
+def get_headers(context):
     """Retrieve headers from config and ensure necessary defaults are included."""
     headers = config.get_headers()
-    headers.setdefault("Accept", "application/json")
-    headers.setdefault("Content-Type", "application/json")
+    if context.api_verb.upper() == "GET":
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer your_token_here"
+        }
+    elif context.api_verb.upper() == "POST":
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
     return headers
 
 

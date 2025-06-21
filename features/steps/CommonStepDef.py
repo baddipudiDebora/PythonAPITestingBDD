@@ -4,6 +4,7 @@ import os
 from behave import given, when, then
 import api_utils  # Utility module for requests and config
 import api_validations
+from file_util import load_json_payload
 
 
 @given('I call the "{api_verb}" verb request for the endpoint "{endpointname}"')
@@ -21,7 +22,6 @@ def step_impl(context,query_params):
     print(context.url)
 
 
-
 @given("I add the path params '{pet_id}'")
 def step_impl(context, pet_id):
     context.url = context.base_url.replace("{pet_id}", str(pet_id)) # Append query parameters
@@ -30,20 +30,13 @@ def step_impl(context, pet_id):
 
 @given("I add a payload from '{jsonfileName}' json file")
 def step_impl(context, jsonfileName):
-    file_path = os.path.join(os.path.dirname(__file__), 'jsonSamples', jsonfileName + '.json')
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"🚫 File '{file_path}' not found. Please check the filename or path.")
-    try:
-        with open(file_path, 'r') as file:
-            context.json_data = json.load(file)
-    except json.JSONDecodeError as e:
-        raise ValueError(f"⚠️ Failed to parse JSON from '{file_path}': {e}")
+    context.json_data = load_json_payload(jsonfileName)
 
 
 @when("I attach headers")
 def step_attach_headers(context):
     """Headers are attached automatically by utility functions, but additional modifications can be done here."""
-    context.headers = api_utils.get_headers()
+    context.headers = api_utils.get_headers(context)
 
 
 @when("I send the request")
